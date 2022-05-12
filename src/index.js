@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-
+const movies = require("./data/movies.json");
 // create and config server
 const server = express();
 server.use(cors());
@@ -13,21 +13,14 @@ server.listen(serverPort, () => {
 });
 
 server.get("/movies", (req, res) => {
+  console.log(req.query);
+  const genderFilterParam = req.query.gender.toLowerCase()
+    ? req.query.gender
+    : "";
   res.json({
     success: true,
-    movies: [
-      {
-        id: "1",
-        title: "Gambita de dama",
-        gender: "Drama",
-        image: "https://via.placeholder.com/150",
-      },
-      {
-        id: "2",
-        title: "Friends",
-        gender: "Comedia",
-        image: "https://via.placeholder.com/150",
-      },
-    ],
+    movies: movies.filter((gender) =>
+      gender.includes(genderFilterParam.toLowerCase())
+    ),
   });
 });
