@@ -1,6 +1,7 @@
-const express = require("express");
-const cors = require("cors");
-const movies = require("./data/movies.json");
+const express = require('express');
+const cors = require('cors');
+const movies = require('./data/movies.json');
+const users = require('./data/users.json');
 // create and config server
 const server = express();
 server.use(cors());
@@ -12,15 +13,26 @@ server.listen(serverPort, () => {
   console.log(`Server listening at http://localhost:${serverPort}`);
 });
 
-server.get("/movies", (req, res) => {
+server.get('/movies', (req, res) => {
   console.log(req.query);
   const genderFilterParam = req.query.gender.toLowerCase()
     ? req.query.gender
-    : "";
+    : '';
   res.json({
     success: true,
-    movies: movies.filter((gender) =>
-      gender.includes(genderFilterParam.toLowerCase())
+    movies: movies.filter((movie) =>
+      movie.gender.includes(genderFilterParam.toLowerCase())
     ),
   });
 });
+
+server.post('/login', (req, res) => {
+  console.log(req.body);
+  console.log('hola');
+});
+
+const staticServerPathWeb = './src/public-react'; // En esta carpeta ponemos los ficheros estáticos
+server.use(express.static(staticServerPathWeb));
+
+const staticServerPathImages = './src/public-movies-images/'; // En esta carpeta ponemos los ficheros estáticos
+server.use(express.static(staticServerPathImages));
