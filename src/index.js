@@ -15,7 +15,6 @@ server.listen(serverPort, () => {
 });
 
 server.get('/movies', (req, res) => {
-  console.log(req.query);
   const genderFilterParam = req.query.gender.toLowerCase()
     ? req.query.gender
     : '';
@@ -30,6 +29,22 @@ server.get('/movies', (req, res) => {
 server.post('/login', (req, res) => {
   console.log(req.body);
   console.log('hola');
+  const foundUser = users.find(
+    (user) =>
+      user.email === req.body.email.toLowerCase() &&
+      user.password === req.body.password
+  );
+  if (foundUser) {
+    res.json({
+      success: true,
+      userId: 'id_de_la_usuaria_encontrada',
+    });
+  } else {
+    res.json({
+      success: false,
+      errorMessage: 'Usuaria/o no encontrada/o',
+    });
+  }
 });
 
 server.get('/movie/:movieId', (req, res) => {
