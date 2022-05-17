@@ -6,6 +6,7 @@ const users = require('./data/users.json');
 const server = express();
 server.use(cors());
 server.use(express.json());
+server.set('view engine', 'ejs');
 
 // init express aplication
 const serverPort = 4000;
@@ -31,8 +32,18 @@ server.post('/login', (req, res) => {
   console.log('hola');
 });
 
+server.get('/movie/:movieId', (req, res) => {
+  console.log(req.params);
+  const foundMovie = movies.find((movie) => movie.id === req.params.movieId);
+  console.log(foundMovie);
+  res.render('movie', foundMovie);
+});
+
 const staticServerPathWeb = './src/public-react'; // En esta carpeta ponemos los ficheros estáticos
 server.use(express.static(staticServerPathWeb));
 
 const staticServerPathImages = './src/public-movies-images/'; // En esta carpeta ponemos los ficheros estáticos
 server.use(express.static(staticServerPathImages));
+
+const staticServerPathStyle = './src/web/src/stylesheets'; // En esta carpeta ponemos los ficheros estáticos
+server.use(express.static(staticServerPathStyle));
