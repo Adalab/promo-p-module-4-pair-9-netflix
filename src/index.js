@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
-const movies = require("./data/movies.json");
-const users = require("./data/users.json");
+const Database = require("better-sqlite3");
+
 // create and config server
 const server = express();
 server.use(cors());
@@ -14,30 +14,43 @@ server.listen(serverPort, () => {
   console.log(`Server listening at http://localhost:${serverPort}`);
 });
 
+const db = new Database("./src/db/database.db", {
+  // con verbose le decimos que muestre en la consola todas las queries que se ejecuten
+  verbose: console.log,
+  // así podemos comprobar qué queries estamos haciendo en todo momento
+});
+
 server.get("/movies", (req, res) => {
-  const genderFilterParam = req.query.gender.toLowerCase()
-    ? req.query.gender
-    : "";
+  let movies;
+  if (req.query.gender === "") {
+    const query = db.prepare(
+      `SELECT * FROM movies ORDER BY name ${req.query.sort}`
+    );
+    movies = query.all();
+  } else {
+    const query = db.prepare(
+      `SELECT * FROM movies WHERE gender=? ORDER BY name ${req.query.sort}`
+    );
+    movies = query.all(req.query.gender);
+  }
+
   res.json({
     success: true,
-    movies: movies.filter((movie) =>
-      movie.gender.includes(genderFilterParam.toLowerCase())
-    ),
+    movies: movies,
   });
 });
 
 server.post("/login", (req, res) => {
   console.log(req.body);
   console.log("hola");
-  const foundUser = users.find(
-    (user) =>
-      user.email === req.body.email.toLowerCase() &&
-      user.password === req.body.password
-  );
+
+  const query = db.prepare(`SELECT * FROM users WHERE email=? AND password=?`);
+  const foundUser = query.get(req.body.email, req.body.password);
+
   if (foundUser) {
     res.json({
       success: true,
-      userId: "id_de_la_usuaria_encontrada",
+      userId: foundUser.id,
     });
   } else {
     res.json({
@@ -49,8 +62,11 @@ server.post("/login", (req, res) => {
 
 server.get("/movie/:movieId", (req, res) => {
   console.log(req.params);
-  const foundMovie = movies.find((movie) => movie.id === req.params.movieId);
-  console.log(foundMovie);
+  const query = db.prepare(
+    `SELECT * FROM movies WHERE id = ${req.params.movieId}`
+  );
+  const foundMovie = query.get();
+
   res.render("movie", foundMovie);
 });
 
