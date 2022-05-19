@@ -71,8 +71,48 @@ server.get("/movie/:movieId", (req, res) => {
 });
 
 server.post("/sign-up", (req, res) => {
-  req.body.email;
-  req.body.password;
+  const userEmail = db.prepare("SELECT email FROM users WHERE email= ?");
+  const foundUser = userEmail.get(req.body.email);
+
+  if (foundUser === undefined) {
+    const query = db.prepare(
+      "INSERT INTO users (email, password) VALUES (?, ?)"
+    );
+    const result = query.run(req.body.email, req.body.password);
+    console.log(result);
+    res.json({ success: true, errorMessage: "Usuaria creada" });
+  } else {
+    res.json({
+      success: false,
+      errorMessage: "Usuaria ya existente",
+    });
+  }
+});
+
+server.post("/profile", (req, res) => {
+  const name = req.body.name;
+  const email = req.body.email;
+  const password = req.body.password;
+  const id = req.header.userId;
+  const query = db.prepare(
+    "UPDATE users SET name=?, email=?, password=? WHERE id=?"
+  );
+  console.log(id);
+  console.log(name);
+  console.log(req.body);
+  const userUpdate = query.run(name, email, password, id);
+  console.log(userUpdate);
+  if (userUpdate.changes !== 0) {
+    res.json({
+      error: false,
+      msj: "se modificó con éxito",
+    });
+  } else {
+    res.json({
+      error: true,
+      msj: "ha ocurrido un error",
+    });
+  }
 });
 
 const staticServerPathWeb = "./src/public-react"; // En esta carpeta ponemos los ficheros estáticos
