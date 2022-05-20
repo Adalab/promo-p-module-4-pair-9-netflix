@@ -1,0 +1,26 @@
+* {
+  font-family: 'Roboto', sans-serif;
+  color: #54585b;
+}
+
+.card__img {
+  width: 200px;
+}
+
+.card__title {
+  display: block;
+  margin: 0;
+  padding-top: 0.3rem;
+  font-size: 1.5rem;
+}
+
+.card__description {
+  display: block;
+  margin: 0;
+  padding-bottom: 0.3rem;
+  font-size: 1rem;
+}
+
+.card__link {
+  display: block;
+}
